@@ -22,12 +22,16 @@ func mapDir(name string) (map[[16]byte]string, error) {
 	}
 	m := make(map[[16]byte]string, len(dirlist))
 	for _, item := range dirlist {
-		file, err := os.Open(filepath.Join(fullPath, item.Name()))
+		if item.IsDir() {
+			continue
+		}
+		longName := filepath.Join(fullPath, item.Name())
+		file, err := os.Open(longName)
 		if err != nil {
 			return m, err
 		}
 		data, err := ioutil.ReadAll(file)
-		m[md5.Sum(data)] = item.Name()
+		m[md5.Sum(data)] = longName
 	}
 	return m, nil
 
